@@ -2,8 +2,25 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Edi Wang</Authors>
+        <Company>edi.wang</Company>
+        <PackageTags>Gravatar</PackageTags>
+        <PackageProjectUrl>https://edi.wang</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/EdiWang/Edi.Gravatar</RepositoryUrl>
+        <Version>1.0.0</Version>
+        <Description>ASP.NET Core Gravatar Image TagHelper</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>edi-logo-blue.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
+
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include=".\README.md" Pack="true" PackagePath="\"/>
+        <None Include=".\edi-logo-blue.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 </Project>
