@@ -18,6 +18,8 @@ public class GravatarImgHelper : TagHelper
 
     public bool ForceDefaultImage { get; set; }
 
+    public string Alt { get; set; } = "Gravatar image";
+
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
         var email = string.IsNullOrEmpty(Email) ? string.Empty : Email.Trim().ToLower();
@@ -36,26 +38,19 @@ public class GravatarImgHelper : TagHelper
 
         output.TagName = "img";
         output.Attributes.SetAttribute("src", src);
-        output.Attributes.SetAttribute("alt", "Gravatar image");
+        output.Attributes.SetAttribute("alt", Alt);
     }
 
     private static string GetMd5Hash(string input)
     {
-        // Convert the input string to a byte array and compute the hash.
         var data = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(input));
-
-        // Create a new Stringbuilder to collect the bytes
-        // and create a string.
         var sBuilder = new StringBuilder();
 
-        // Loop through each byte of the hashed data
-        // and format each one as a hexadecimal string.
         foreach (var t in data)
         {
             sBuilder.Append(t.ToString("x2"));
         }
 
-        // Return the hexadecimal string.
         return sBuilder.ToString();
     }
 }
