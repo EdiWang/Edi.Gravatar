@@ -43,7 +43,7 @@ public class GravatarImgHelper : TagHelper
 
     private static string GetMd5Hash(string input)
     {
-        var data = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(input));
+        var data = MD5.HashData(Encoding.UTF8.GetBytes(input));
         var sBuilder = new StringBuilder();
 
         foreach (var t in data)
