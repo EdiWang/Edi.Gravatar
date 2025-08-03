@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edi.Gravatar", "Edi.Gravatar.csproj", "{D8616C12-D33C-442D-A60D-6671533D482C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edi.Gravatar", "Edi.Gravatar\Edi.Gravatar.csproj", "{D8616C12-D33C-442D-A60D-6671533D482C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
