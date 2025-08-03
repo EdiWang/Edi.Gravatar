@@ -8,7 +8,10 @@ namespace Edi.Gravatar;
 [HtmlTargetElement("gravatar", TagStructure = TagStructure.NormalOrSelfClosing)]
 public class GravatarImgHelper : TagHelper
 {
-    public string Email { get; set; }
+    private const string GravatarBaseUrl = "gravatar.com/avatar/";
+    private const string DefaultRating = "g";
+
+    public string? Email { get; set; }
 
     public int Size { get; set; } = 58;
 
@@ -22,35 +25,52 @@ public class GravatarImgHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        var email = string.IsNullOrEmpty(Email) ? string.Empty : Email.Trim().ToLower();
-        var emailHash = GetMd5Hash(email);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(output);
 
-        var src = string.Format("{0}://{1}.gravatar.com/avatar/{2}?s={3}{4}{5}{6}",
-            PreferHttps ? "https" : "http",
-            PreferHttps ? "secure" : "www",
-            emailHash,
-            Size.ToString(),
-            "&d=" + (!string.IsNullOrEmpty(DefaultImageUrl)
-                ? UrlEncoder.Default.Encode(DefaultImageUrl)
-                : string.Empty),
-            ForceDefaultImage ? "&f=y" : string.Empty,
-            "&r=g");
+        var normalizedEmail = NormalizeEmail(Email);
+        var emailHash = GetMd5Hash(normalizedEmail);
+        var gravatarUrl = BuildGravatarUrl(emailHash);
 
         output.TagName = "img";
-        output.Attributes.SetAttribute("src", src);
+        output.Attributes.SetAttribute("src", gravatarUrl);
         output.Attributes.SetAttribute("alt", Alt);
+        
+        // Add loading attribute for better performance
+        output.Attributes.SetAttribute("loading", "lazy");
+    }
+
+    private static string NormalizeEmail(string? email)
+    {
+        return string.IsNullOrWhiteSpace(email) ? string.Empty : email.Trim().ToLowerInvariant();
+    }
+
+    private string BuildGravatarUrl(string emailHash)
+    {
+        var protocol = PreferHttps ? "https" : "http";
+        var subdomain = PreferHttps ? "secure" : "www";
+        
+        var urlBuilder = new StringBuilder()
+            .Append($"{protocol}://{subdomain}.{GravatarBaseUrl}{emailHash}")
+            .Append($"?s={Size}")
+            .Append($"&r={DefaultRating}");
+
+        if (!string.IsNullOrWhiteSpace(DefaultImageUrl))
+        {
+            urlBuilder.Append("&d=").Append(UrlEncoder.Default.Encode(DefaultImageUrl));
+        }
+
+        if (ForceDefaultImage)
+        {
+            urlBuilder.Append("&f=y");
+        }
+
+        return urlBuilder.ToString();
     }
 
     private static string GetMd5Hash(string input)
     {
-        var data = MD5.HashData(Encoding.UTF8.GetBytes(input));
-        var sBuilder = new StringBuilder();
-
-        foreach (var t in data)
-        {
-            sBuilder.Append(t.ToString("x2"));
-        }
-
-        return sBuilder.ToString();
+        var hashBytes = MD5.HashData(Encoding.UTF8.GetBytes(input));
+        return Convert.ToHexString(hashBytes).ToLowerInvariant();
     }
 }
