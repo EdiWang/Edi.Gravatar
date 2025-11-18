@@ -70,5 +70,5 @@ Add the TagHelper to your `_ViewImports.cshtml`:
 
 ## Requirements
 
-- .NET 8.0 or .NET 9.0
+- .NET 8.0 or .NET 10.0
 - ASP.NET Core
