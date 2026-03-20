@@ -3,15 +3,13 @@ using System.Text.Encodings.Web;
 
 namespace Edi.Gravatar.Tests;
 
-[TestClass]
 public class GravatarImgHelperTests
 {
-    private GravatarImgHelper _tagHelper;
-    private TagHelperContext _context;
-    private TagHelperOutput _output;
+    private readonly GravatarImgHelper _tagHelper;
+    private readonly TagHelperContext _context;
+    private readonly TagHelperOutput _output;
 
-    [TestInitialize]
-    public void Setup()
+    public GravatarImgHelperTests()
     {
         _tagHelper = new GravatarImgHelper();
         _context = new TagHelperContext(
@@ -19,7 +17,7 @@ public class GravatarImgHelperTests
             allAttributes: [],
             items: new Dictionary<object, object>(),
             uniqueId: "test");
-        
+
         _output = new TagHelperOutput(
             tagName: "gravatar",
             attributes: [],
@@ -27,7 +25,7 @@ public class GravatarImgHelperTests
                 Task.FromResult<TagHelperContent>(new DefaultTagHelperContent()));
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithValidEmail_GeneratesCorrectImageTag()
     {
         // Arrange
@@ -37,18 +35,18 @@ public class GravatarImgHelperTests
         _tagHelper.Process(_context, _output);
 
         // Assert
-        Assert.AreEqual("img", _output.TagName);
-        Assert.AreEqual("Gravatar image", _output.Attributes["alt"].Value);
-        Assert.AreEqual("lazy", _output.Attributes["loading"].Value);
-        
+        Assert.Equal("img", _output.TagName);
+        Assert.Equal("Gravatar image", _output.Attributes["alt"].Value);
+        Assert.Equal("lazy", _output.Attributes["loading"].Value);
+
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         Assert.Contains("https://secure.gravatar.com/avatar/", srcValue);
         Assert.Contains("s=58", srcValue); // Default size
         Assert.Contains("r=g", srcValue); // Default rating
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithNullEmail_GeneratesImageTagWithEmptyEmailHash()
     {
         // Arrange
@@ -59,12 +57,12 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         // MD5 hash of empty string is d41d8cd98f00b204e9800998ecf8427e
         Assert.Contains("d41d8cd98f00b204e9800998ecf8427e", srcValue);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithWhitespaceEmail_GeneratesImageTagWithEmptyEmailHash()
     {
         // Arrange
@@ -75,12 +73,12 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         // MD5 hash of empty string is d41d8cd98f00b204e9800998ecf8427e
         Assert.Contains("d41d8cd98f00b204e9800998ecf8427e", srcValue);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithMixedCaseEmail_NormalizesToLowerCase()
     {
         // Arrange
@@ -91,12 +89,12 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         // Should contain the same hash as "test@example.com"
         Assert.Contains("55502f40dc8b7c769880b10874abc9d0", srcValue);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithEmailWithSpaces_TrimsSpaces()
     {
         // Arrange
@@ -107,12 +105,12 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         // Should contain the same hash as "test@example.com"
         Assert.Contains("55502f40dc8b7c769880b10874abc9d0", srcValue);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithCustomSize_IncludesSizeInUrl()
     {
         // Arrange
@@ -124,11 +122,11 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         Assert.Contains("s=128", srcValue);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithCustomAlt_SetsAltAttribute()
     {
         // Arrange
@@ -139,10 +137,10 @@ public class GravatarImgHelperTests
         _tagHelper.Process(_context, _output);
 
         // Assert
-        Assert.AreEqual("Custom alt text", _output.Attributes["alt"].Value);
+        Assert.Equal("Custom alt text", _output.Attributes["alt"].Value);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithDefaultImageUrl_IncludesEncodedUrlInGravatarUrl()
     {
         // Arrange
@@ -154,12 +152,12 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         var expectedEncodedUrl = UrlEncoder.Default.Encode("https://example.com/default-avatar.png");
         Assert.Contains($"&d={expectedEncodedUrl}", srcValue);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithForceDefaultImage_IncludesForceParameter()
     {
         // Arrange
@@ -171,11 +169,11 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         Assert.Contains("&f=y", srcValue);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithPreferHttpsFalse_UsesHttpProtocol()
     {
         // Arrange
@@ -187,11 +185,11 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         Assert.StartsWith("http://www.gravatar.com/avatar/", srcValue);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithPreferHttpsTrue_UsesHttpsProtocol()
     {
         // Arrange
@@ -203,11 +201,11 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         Assert.StartsWith("https://secure.gravatar.com/avatar/", srcValue);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithAllOptions_GeneratesCompleteUrl()
     {
         // Arrange
@@ -223,57 +221,57 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
-        
+        Assert.NotNull(srcValue);
+
         Assert.StartsWith("http://www.gravatar.com/avatar/", srcValue);
         Assert.Contains("55502f40dc8b7c769880b10874abc9d0", srcValue); // MD5 of test@example.com
         Assert.Contains("s=256", srcValue);
         Assert.Contains("r=g", srcValue);
         Assert.Contains("&f=y", srcValue);
-        
+
         var expectedEncodedUrl = UrlEncoder.Default.Encode("https://example.com/default.jpg");
         Assert.Contains($"&d={expectedEncodedUrl}", srcValue);
-        
-        Assert.AreEqual("Test avatar", _output.Attributes["alt"].Value);
-        Assert.AreEqual("lazy", _output.Attributes["loading"].Value);
+
+        Assert.Equal("Test avatar", _output.Attributes["alt"].Value);
+        Assert.Equal("lazy", _output.Attributes["loading"].Value);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithNullContext_ThrowsArgumentNullException()
     {
         // Arrange
         _tagHelper.Email = "test@example.com";
 
         // Act & Assert
-        Assert.ThrowsExactly<ArgumentNullException>(() => _tagHelper.Process(null!, _output));
+        Assert.Throws<ArgumentNullException>(() => _tagHelper.Process(null!, _output));
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_WithNullOutput_ThrowsArgumentNullException()
     {
         // Arrange
         _tagHelper.Email = "test@example.com";
 
         // Act & Assert
-        Assert.ThrowsExactly<ArgumentNullException>(() => _tagHelper.Process(_context, null!));
+        Assert.Throws<ArgumentNullException>(() => _tagHelper.Process(_context, null!));
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_DefaultValues_AreSetCorrectly()
     {
         // Arrange & Act
         var tagHelper = new GravatarImgHelper();
 
         // Assert
-        Assert.AreEqual(58, tagHelper.Size);
-        Assert.AreEqual(string.Empty, tagHelper.DefaultImageUrl);
-        Assert.IsTrue(tagHelper.PreferHttps);
-        Assert.IsFalse(tagHelper.ForceDefaultImage);
-        Assert.AreEqual("Gravatar image", tagHelper.Alt);
-        Assert.IsNull(tagHelper.Email);
+        Assert.Equal(58, tagHelper.Size);
+        Assert.Equal(string.Empty, tagHelper.DefaultImageUrl);
+        Assert.True(tagHelper.PreferHttps);
+        Assert.False(tagHelper.ForceDefaultImage);
+        Assert.Equal("Gravatar image", tagHelper.Alt);
+        Assert.Null(tagHelper.Email);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_AlwaysAddsLoadingLazyAttribute()
     {
         // Arrange
@@ -283,10 +281,10 @@ public class GravatarImgHelperTests
         _tagHelper.Process(_context, _output);
 
         // Assert
-        Assert.AreEqual("lazy", _output.Attributes["loading"].Value);
+        Assert.Equal("lazy", _output.Attributes["loading"].Value);
     }
 
-    [TestMethod]
+    [Fact]
     public void Process_GeneratesKnownMd5Hash()
     {
         // Arrange
@@ -297,7 +295,7 @@ public class GravatarImgHelperTests
 
         // Assert
         var srcValue = _output.Attributes["src"].Value?.ToString();
-        Assert.IsNotNull(srcValue);
+        Assert.NotNull(srcValue);
         // MD5 hash of "myemailaddress@example.com" (normalized)
         Assert.Contains("0bc83cb571cd1c50ba6f3e8a78ef1346", srcValue);
     }
